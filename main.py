@@ -266,14 +266,9 @@ if __name__ == "__main__":
     generated_prompt = generate_transcript_prompt(character_map=character_map, transcript=transcript)
     print(f"Generated Prompt: {generated_prompt}")
 
-
-
     
-    # response_text = llm_gen.generate_text(prompt_text=test_prompt, config=text_config)
-    
-
-
-    
+    # response_text = project.llm_gen.generate_text(prompt_text=test_prompt, config=text_config)
+    # project.tts_gen.run_scene(scene=my_scene, config=project.tts_config)
     
 
     

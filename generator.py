@@ -17,6 +17,35 @@ class ThinkingLevel(Enum):
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
 
+
+class GenerateTextConfig(BaseModel):
+    # Pydanticの定義に則り、型として ThinkingLevel Enum を指定します
+    thinking_level: ThinkingLevel = ThinkingLevel.MEDIUM
+    top_p: float = 0.95
+    top_k: int = 50
+    temperature: float = 0.7
+    system_instruction: str = ""
+
+    # Pydantic v2 の仕様に基づき、任意の型（Enum等）の扱いを許可
+    model_config = {"arbitrary_types_allowed": True}
+
+    def to_gemini_config(self) -> types.GenerateContentConfig:
+        # GenerateContentConfig の直下の引数として直接指定します
+        return types.GenerateContentConfig(
+            thinking_config=types.ThinkingConfig(
+                thinking_level=self.thinking_level.value,
+            ),
+            temperature=self.temperature,
+            top_p=self.top_p,
+            top_k=self.top_k,
+            tools=[
+                types.Tool(url_context=types.UrlContext()),
+            ],
+            system_instruction=[
+                types.Part.from_text(text=self.system_instruction)
+            ]
+        )
+
 class GeneratorVoiceConfig(BaseModel):
     temperature: float = 1.0
     response_modalities: List[str] = ["audio"]
@@ -98,33 +127,6 @@ class TtsGenerator:
 
         print("Cleanup complete: Temporary directory and WAV segments removed automatically.")
 
-class GenerateTextConfig(BaseModel):
-    # Pydanticの定義に則り、型として ThinkingLevel Enum を指定します
-    thinking_level: ThinkingLevel = ThinkingLevel.MEDIUM
-    top_p: float = 0.95
-    top_k: int = 50
-    temperature: float = 0.7
-    system_instruction: str = ""
-
-    # Pydantic v2 の仕様に基づき、任意の型（Enum等）の扱いを許可
-    model_config = {"arbitrary_types_allowed": True}
-
-    def to_gemini_config(self) -> types.GenerateContentConfig:
-        # GenerateContentConfig の直下の引数として直接指定します
-        return types.GenerateContentConfig(
-            thinking_config=types.ThinkingConfig(
-                thinking_level=self.thinking_level.value,
-            ),
-            temperature=self.temperature,
-            top_p=self.top_p,
-            top_k=self.top_k,
-            tools=[
-                types.Tool(url_context=types.UrlContext()),
-            ],
-            system_instruction=[
-                types.Part.from_text(text=self.system_instruction)
-            ]
-        )
 class LlmGenerator:
     def __init__(self, api_key: str, model_name: str = "gemini-3.5-flash"):
         self.client = genai.Client(api_key=api_key)
@@ -155,3 +157,4 @@ class LlmGenerator:
                 
         print() # 改行用
         return "".join(full_response)
+
