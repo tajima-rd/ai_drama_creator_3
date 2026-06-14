@@ -111,8 +111,6 @@ def main():
     
     app = MainWindow(project)
 
-    print(app.project.acts)
-
     # app.generate_all_dialogues()
     # app.generate_all_scenes()
     # app.generate_all_sound()
@@ -124,4 +122,3 @@ def main():
 if __name__ == "__main__":
     main()
     
-    # project.tts_gen.run_scene(scene=my_scene, config=project.tts_config)
